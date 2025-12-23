@@ -9,12 +9,27 @@ const router = express.Router();
 
 router.get("/dashboard", requireAuth, (req, res) => {
   const userId = req.session.user.id;
+  const limit = 5;
+  const total = db
+    .prepare("SELECT COUNT(*) as total FROM applications WHERE user_id = ?")
+    .get(userId).total;
+  const totalPages = Math.max(1, Math.ceil(total / limit));
+  const requestedPage = Number.parseInt(req.query.page, 10) || 1;
+  const page = Math.min(Math.max(requestedPage, 1), totalPages);
+  const offset = (page - 1) * limit;
   const applications = db
-    .prepare("SELECT * FROM applications WHERE user_id = ? ORDER BY created_at DESC")
-    .all(userId);
-	
-	res.render("app/dashboard", {
+    .prepare(
+      "SELECT * FROM applications WHERE user_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?"
+    )
+    .all(userId, limit, offset);
+
+  res.render("app/dashboard", {
     applications,
+	pagination: {
+      currentPage: page,
+      totalPages,
+      basePath: "/dashboard",
+    },
   });
 });
 

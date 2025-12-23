@@ -6,14 +6,30 @@ const { requireAdmin } = require("../middleware/auth");
 const router = express.Router();
 
 router.get("/admin/applications", requireAdmin, (req, res) => {
-  const rows = db.prepare(`
-    SELECT a.*, u.full_name, u.email
-    FROM applications a
-    JOIN users u ON u.id = a.user_id
-    ORDER BY a.created_at DESC
-  `).all();
+  const limit = 10;
+  const total = db.prepare("SELECT COUNT(*) as total FROM applications").get().total;
+  const totalPages = Math.max(1, Math.ceil(total / limit));
+  const requestedPage = Number.parseInt(req.query.page, 10) || 1;
+  const page = Math.min(Math.max(requestedPage, 1), totalPages);
+  const offset = (page - 1) * limit;
+  const rows = db
+    .prepare(`
+      SELECT a.*, u.full_name, u.email
+      FROM applications a
+      JOIN users u ON u.id = a.user_id
+      ORDER BY a.created_at DESC
+      LIMIT ? OFFSET ?
+    `)
+    .all(limit, offset);
 
-  res.render("admin/applications", { applications: rows });
+  res.render("admin/applications", {
+    applications: rows,
+    pagination: {
+      currentPage: page,
+      totalPages,
+      basePath: "/admin/applications",
+    },
+  });
 });
 
 router.get("/admin/applications/:id", requireAdmin, (req, res) => {

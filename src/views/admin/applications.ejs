@@ -41,4 +41,36 @@
   </div>
 </div>
 
+<% if (pagination && pagination.totalPages > 1) { %>
+  <nav class="mt-4" aria-label="Applications pagination">
+    <ul class="pagination justify-content-center mb-0">
+      <li class="page-item <%= pagination.currentPage === 1 ? "disabled" : "" %>">
+        <a
+          class="page-link"
+          href="<%= pagination.basePath %>?page=<%= pagination.currentPage - 1 %>"
+          aria-label="Previous"
+        >
+          <span aria-hidden="true">&laquo;</span>
+        </a>
+      </li>
+      <% for (let page = 1; page <= pagination.totalPages; page++) { %>
+        <li class="page-item <%= page === pagination.currentPage ? "active" : "" %>">
+          <a class="page-link" href="<%= pagination.basePath %>?page=<%= page %>">
+            <%= page %>
+          </a>
+        </li>
+      <% } %>
+      <li class="page-item <%= pagination.currentPage === pagination.totalPages ? "disabled" : "" %>">
+        <a
+          class="page-link"
+          href="<%= pagination.basePath %>?page=<%= pagination.currentPage + 1 %>"
+          aria-label="Next"
+        >
+          <span aria-hidden="true">&raquo;</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+<% } %>
+
 <%- include("../partials/footer") %>
