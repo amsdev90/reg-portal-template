@@ -35,6 +35,7 @@
     <% if (currentUser) { %>
       <% if (currentUser.role === "ADMIN") { %>
         <a class="btn btn-sm btn-outline-dark" href="/admin/applications">Applications</a>
+		<a class="btn btn-sm btn-outline-dark" href="/admin/users/new">Create User</a>
       <% } else { %>
         <a class="btn btn-sm btn-outline-dark" href="/dashboard">Dashboard</a>
         <a class="btn btn-sm btn-outline-dark" href="/apply">Submit Application</a>

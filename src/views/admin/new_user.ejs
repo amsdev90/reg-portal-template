@@ -1,0 +1,47 @@
+<%- include("../partials/header", { title: "Admin - Create User" }) %>
+<%- include("../partials/alerts") %>
+
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h1 class="h4 mb-3">Create a new user</h1>
+        <p class="text-muted mb-4">
+          Use this form to add a new account and assign the appropriate role.
+        </p>
+
+        <form action="/admin/users" method="post">
+          <div class="mb-3">
+            <label class="form-label" for="full_name">Full name</label>
+            <input class="form-control" type="text" id="full_name" name="full_name" required />
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label" for="email">Email address</label>
+            <input class="form-control" type="email" id="email" name="email" required />
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label" for="password">Temporary password</label>
+            <input class="form-control" type="password" id="password" name="password" required />
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label" for="role">Role</label>
+            <select class="form-select" id="role" name="role" required>
+              <option value="USER">User</option>
+              <option value="ADMIN">Admin</option>
+            </select>
+          </div>
+
+          <div class="d-flex gap-2">
+            <button class="btn btn-primary" type="submit">Create user</button>
+            <a class="btn btn-outline-secondary" href="/admin/applications">Back to applications</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include("../partials/footer") %>

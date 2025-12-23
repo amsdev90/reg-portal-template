@@ -1,5 +1,6 @@
 const express = require("express");
 const path = require("path");
+const bcrypt = require("bcrypt");
 const db = require("../db/database");
 const { requireAdmin } = require("../middleware/auth");
 
@@ -46,6 +47,41 @@ router.get("/admin/applications/:id", requireAdmin, (req, res) => {
     .prepare("SELECT * FROM application_files WHERE application_id = ? ORDER BY created_at DESC")
     .all(id);
   res.render("admin/application_detail", { application: row, files });
+});
+
+router.get("/admin/users/new", requireAdmin, (req, res) => {
+  res.render("admin/new_user", { title: "Admin - Create User" });
+});
+
+router.post("/admin/users", requireAdmin, async (req, res) => {
+  const full_name = (req.body.full_name || "").trim();
+  const email = (req.body.email || "").trim().toLowerCase();
+  const password = req.body.password || "";
+  const role = (req.body.role || "USER").trim().toUpperCase();
+
+  if (!full_name || !email || !password) {
+    req.session.flash = { type: "danger", message: "Please fill out all required fields." };
+    return res.redirect("/admin/users/new");
+  }
+
+  if (!["USER", "ADMIN"].includes(role)) {
+    req.session.flash = { type: "danger", message: "Invalid role selected." };
+    return res.redirect("/admin/users/new");
+  }
+
+  const existing = db.prepare("SELECT id FROM users WHERE email = ?").get(email);
+  if (existing) {
+    req.session.flash = { type: "danger", message: "Email already in use." };
+    return res.redirect("/admin/users/new");
+  }
+
+  const password_hash = await bcrypt.hash(password, 12);
+
+  db.prepare("INSERT INTO users (full_name, email, password_hash, role) VALUES (?, ?, ?, ?)")
+    .run(full_name, email, password_hash, role);
+
+  req.session.flash = { type: "success", message: "User created successfully." };
+  return res.redirect("/admin/users/new");
 });
 
 router.get("/admin/files/:id", requireAdmin, (req, res) => {
