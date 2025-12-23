@@ -13,7 +13,11 @@ router.get("/dashboard", requireAuth, (req, res) => {
     .prepare("SELECT * FROM applications WHERE user_id = ? ORDER BY created_at DESC LIMIT 1")
     .get(userId);
 
-  res.render("app/dashboard", { application: appRow || null });
+  const application = appRow || null;
+  res.render("app/dashboard", {
+    application,
+    applications: application ? [application] : [],
+  });
 });
 
 router.get("/apply", requireAuth, (req, res) => {

@@ -1,22 +1,36 @@
 <%- include("../partials/header", { title: "Apply" }) %>
 <%- include("../partials/alerts") %>
 
-<h1>Submit application</h1>
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+  <h1 class="h3 mb-0">Submit application</h1>
+  <a class="btn btn-outline-secondary" href="/dashboard">Back to dashboard</a>
+</div>
 
-<form method="post" action="/apply" class="card" enctype="multipart/form-data">
-  <label>Organization</label>
-  <input name="organization" placeholder="e.g., Stable Name / Company" />
-
-  <label>Phone</label>
-  <input name="phone" placeholder="+973..." />
-
-  <label>Message</label>
-  <textarea name="message" rows="5" placeholder="Tell us about your request..."></textarea>
-  
-  <label>Supporting documents (up to 5 files, 5MB each)</label>
-  <input type="file" name="documents" multiple accept=".pdf,.doc,.docx,image/*" />
-
-  <button type="submit">Submit</button>
+<form method="post" action="/apply" class="card shadow-sm" enctype="multipart/form-data">
+  <div class="card-body">
+    <div class="row g-3">
+      <div class="col-12 col-md-6">
+        <label class="form-label">Organization</label>
+        <input class="form-control" name="organization" placeholder="e.g., Stable Name / Company" />
+      </div>
+      <div class="col-12 col-md-6">
+        <label class="form-label">Phone</label>
+        <input class="form-control" name="phone" placeholder="+973..." />
+      </div>
+      <div class="col-12">
+        <label class="form-label">Message</label>
+        <textarea class="form-control" name="message" rows="5" placeholder="Tell us about your request..."></textarea>
+      </div>
+      <div class="col-12">
+        <label class="form-label">Supporting documents (up to 5 files, 5MB each)</label>
+        <input class="form-control" type="file" name="documents" multiple accept=".pdf,.doc,.docx,image/*" />
+      </div>
+    </div>
+    <div class="d-flex flex-wrap gap-2 mt-3">
+      <button class="btn btn-dark" type="submit">Submit application</button>
+      <a class="btn btn-outline-secondary" href="/dashboard">Cancel</a>
+    </div>
+  </div>
 </form>
 
 <%- include("../partials/footer") %>

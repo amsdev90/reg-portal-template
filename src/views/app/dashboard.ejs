@@ -3,19 +3,54 @@
 
 <h1>Dashboard</h1>
 
-<% if (!application) { %>
-  <p>You have no application yet.</p>
-  <a class="btn" href="/apply">Submit application</a>
-<% } else { %>
-  <div class="card">
-    <h2>Your latest application</h2>
-    <p><b>Status:</b> <%= application.status %></p>
-    <p><b>Organization:</b> <%= application.organization || "-" %></p>
-    <p><b>Phone:</b> <%= application.phone || "-" %></p>
-    <p><b>Message:</b> <%= application.message || "-" %></p>
-    <p><b>Admin note:</b> <%= application.admin_note || "-" %></p>
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+  <p class="mb-0 text-secondary">Track all applications you have submitted.</p>
+  <a class="btn btn-dark" href="/apply">Submit application</a>
+</div>
+
+<% const appList = applications || []; %>
+<% if (!appList.length) { %>
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <p class="mb-0">You have no applications yet.</p>
+    </div>
   </div>
-  <a class="btn" href="/apply">Submit another application</a>
+<% } else { %>
+  <% const statusClasses = { APPROVED: "success", REJECTED: "danger", PENDING: "warning" }; %>
+  <div class="row g-3">
+    <% appList.forEach((application) => { %>
+      <div class="col-12">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+              <h2 class="h5 mb-0">Application #<%= application.id %></h2>
+              <span class="badge text-bg-<%= statusClasses[application.status] || "secondary" %>">
+                <%= application.status %>
+              </span>
+            </div>
+            <div class="row g-3">
+              <div class="col-12 col-md-6">
+                <div class="text-uppercase text-secondary small">Organization</div>
+                <div class="fw-semibold"><%= application.organization || "-" %></div>
+              </div>
+              <div class="col-12 col-md-6">
+                <div class="text-uppercase text-secondary small">Phone</div>
+                <div class="fw-semibold"><%= application.phone || "-" %></div>
+              </div>
+              <div class="col-12">
+                <div class="text-uppercase text-secondary small">Message</div>
+                <div class="fw-semibold"><%= application.message || "-" %></div>
+              </div>
+              <div class="col-12">
+                <div class="text-uppercase text-secondary small">Admin note</div>
+                <div class="fw-semibold"><%= application.admin_note || "-" %></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% }) %>
+  </div>
 <% } %>
 
 <%- include("../partials/footer") %>
