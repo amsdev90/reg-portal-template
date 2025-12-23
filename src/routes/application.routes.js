@@ -9,14 +9,12 @@ const router = express.Router();
 
 router.get("/dashboard", requireAuth, (req, res) => {
   const userId = req.session.user.id;
-  const appRow = db
-    .prepare("SELECT * FROM applications WHERE user_id = ? ORDER BY created_at DESC LIMIT 1")
-    .get(userId);
-
-  const application = appRow || null;
-  res.render("app/dashboard", {
-    application,
-    applications: application ? [application] : [],
+  const applications = db
+    .prepare("SELECT * FROM applications WHERE user_id = ? ORDER BY created_at DESC")
+    .all(userId);
+	
+	res.render("app/dashboard", {
+    applications,
   });
 });
 
