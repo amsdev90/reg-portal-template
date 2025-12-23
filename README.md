@@ -1,6 +1,7 @@
 # Reg Portal Template (Node.js + SQLite)
 
-A reusable registration portal template with role-based access:
+A registration portal template with role-based access:
+
 - Users: register, login, and submit an application
 - Admin: review applications and approve/reject with notes
 - Session based authentication / bcrypt password hashing
@@ -9,16 +10,10 @@ A reusable registration portal template with role-based access:
 
 # Setup
 
-1- Dependencies
-
-```npm install```
+1- Install dependencies with ```npm install```
 
 2- Change .env.example to .env and set a session secret
 
-3- Initialize the db and see Admin
+3- Initialize the db and seed Admin with ```npm run seed```
 
-```npm run seed```
-
-4- Start the server
-
-```npm run dev```
+4- Start the server with ```npm run dev```
