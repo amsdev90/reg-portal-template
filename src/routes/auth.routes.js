@@ -2,6 +2,11 @@ const express = require("express");
 const bcrypt = require("bcrypt");
 const db = require("../db/database");
 const { logAudit } = require("../db/audit");
+const {
+  isValidEmail,
+  getNameValidationError,
+  getPasswordValidationError
+} = require("../middleware/validation");
 
 const router = express.Router();
 
@@ -12,9 +17,32 @@ router.post("/register", async (req, res) => {
   const full_name = (req.body.full_name || "").trim();
   const email = (req.body.email || "").trim().toLowerCase();
   const password = req.body.password || "";
+  const confirmPassword = req.body.confirm_password || "";
 
-  if (!full_name || !email || !password) {
+  if (!full_name || !email || !password || !confirmPassword) {
     req.session.flash = { type: "danger", message: "Missing fields." };
+    return res.redirect("/register");
+  }
+  
+    const nameError = getNameValidationError(full_name);
+  if (nameError) {
+    req.session.flash = { type: "danger", message: nameError };
+    return res.redirect("/register");
+  }
+
+  if (!isValidEmail(email)) {
+    req.session.flash = { type: "danger", message: "Please provide a valid email address." };
+    return res.redirect("/register");
+  }
+
+  const passwordError = getPasswordValidationError(password);
+  if (passwordError) {
+    req.session.flash = { type: "danger", message: passwordError };
+    return res.redirect("/register");
+  }
+
+  if (password !== confirmPassword) {
+    req.session.flash = { type: "danger", message: "Passwords do not match." };
     return res.redirect("/register");
   }
 

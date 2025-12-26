@@ -4,6 +4,11 @@ const bcrypt = require("bcrypt");
 const db = require("../db/database");
 const { requireAdmin } = require("../middleware/auth");
 const { logAudit } = require("../db/audit");
+const {
+  isValidEmail,
+  getNameValidationError,
+  getPasswordValidationError
+} = require("../middleware/validation");
 
 const router = express.Router();
 
@@ -200,10 +205,33 @@ router.post("/admin/users", requireAdmin, async (req, res) => {
   const full_name = (req.body.full_name || "").trim();
   const email = (req.body.email || "").trim().toLowerCase();
   const password = req.body.password || "";
+  const confirmPassword = req.body.confirm_password || "";
   const role = (req.body.role || "USER").trim().toUpperCase();
 
-  if (!full_name || !email || !password) {
+  if (!full_name || !email || !password || !confirmPassword) {
     req.session.flash = { type: "danger", message: "Please fill out all required fields." };
+    return res.redirect("/admin/users/new");
+  }
+  
+    const nameError = getNameValidationError(full_name);
+  if (nameError) {
+    req.session.flash = { type: "danger", message: nameError };
+    return res.redirect("/admin/users/new");
+  }
+
+  if (!isValidEmail(email)) {
+    req.session.flash = { type: "danger", message: "Please provide a valid email address." };
+    return res.redirect("/admin/users/new");
+  }
+
+  const passwordError = getPasswordValidationError(password);
+  if (passwordError) {
+    req.session.flash = { type: "danger", message: passwordError };
+    return res.redirect("/admin/users/new");
+  }
+
+  if (password !== confirmPassword) {
+    req.session.flash = { type: "danger", message: "Passwords do not match." };
     return res.redirect("/admin/users/new");
   }
 
