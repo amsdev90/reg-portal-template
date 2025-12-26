@@ -2,6 +2,7 @@ const express = require("express");
 const bcrypt = require("bcrypt");
 const db = require("../db/database");
 const { logAudit } = require("../db/audit");
+const createRateLimiter = require("../middleware/rate-limit");
 const {
   isValidEmail,
   getNameValidationError,
@@ -13,7 +14,21 @@ const router = express.Router();
 router.get("/register", (req, res) => res.render("auth/register"));
 router.get("/login", (req, res) => res.render("auth/login"));
 
-router.post("/register", async (req, res) => {
+const registerRateLimiter = createRateLimiter({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: "Too many registration attempts. Please try again later.",
+  redirectTo: "/register"
+});
+
+const loginRateLimiter = createRateLimiter({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: "Too many login attempts. Please try again later.",
+  redirectTo: "/login"
+});
+
+router.post("/register", registerRateLimiter, async (req, res) => {
   const full_name = (req.body.full_name || "").trim();
   const email = (req.body.email || "").trim().toLowerCase();
   const password = req.body.password || "";
@@ -24,7 +39,7 @@ router.post("/register", async (req, res) => {
     return res.redirect("/register");
   }
   
-    const nameError = getNameValidationError(full_name);
+  const nameError = getNameValidationError(full_name);
   if (nameError) {
     req.session.flash = { type: "danger", message: nameError };
     return res.redirect("/register");
@@ -70,7 +85,7 @@ router.post("/register", async (req, res) => {
   res.redirect("/dashboard");
 });
 
-router.post("/login", async (req, res) => {
+router.post("/login", loginRateLimiter, async (req, res) => {
   const email = (req.body.email || "").trim().toLowerCase();
   const password = req.body.password || "";
 
